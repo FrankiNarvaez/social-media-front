@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useAuth } from "@/context/authContext";
-import { FaPencilAlt } from "react-icons/fa";
+import { FaPencilAlt, FaTrashAlt } from "react-icons/fa";
 import Navbar from "@/components/navbar/Navbar";
 import Post from "@/components/post/Post";
 
@@ -34,6 +34,12 @@ const Profile = () => {
   useEffect(() => {
     console.log(loginToken);
   }, [loginToken]);
+
+  const deletePost = (postId: number) => {
+    console.log({postId})
+    setPosts(posts.filter((_, index) => index !== postId));
+  };
+
 
   let id = 0;
   let datos = [
@@ -247,6 +253,7 @@ const Profile = () => {
 
           <section className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
             {posts.map((post: any, index: any) => (
+              <div key={index} className="relative">
               <Post
                 key={index}
                 userid={post.userid}
@@ -258,8 +265,13 @@ const Profile = () => {
                 comments={post.comments}
                 favorites={post.favorites}
               />
+              <button className="mt-3 absolute top-2 right-2 text-red-600 hover:text-red-800"
+              onClick={() => deletePost(index)}>
+              <FaTrashAlt></FaTrashAlt>
+              </button>
+              </div>
             ))}
-          </section>
+          </section >
         </div>
       </main>
     </div>
