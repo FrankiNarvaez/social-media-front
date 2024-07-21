@@ -264,6 +264,7 @@ const Profile = () => {
                 updateDate={post.updateDate}
                 comments={post.comments}
                 favorites={post.favorites}
+                postId={post.postId}
               />
               <button className="mt-3 absolute top-2 right-2 text-red-600 hover:text-red-800"
               onClick={() => deletePost(index)}>
