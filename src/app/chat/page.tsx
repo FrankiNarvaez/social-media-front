@@ -1,12 +1,13 @@
 'use client'
 
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState} from "react";
 import { useAuth } from "../../context/authContext";
-import { io } from "socket.io-client";
+import { io, Socket } from "socket.io-client";
 import { useSearchParams } from "next/navigation";
+import { DefaultEventsMap } from "@socket.io/component-emitter";
 
 
-function Messages ({messages, chatId}) {
+function Messages ({messages, chatId}: { messages: any[], chatId: string }) {
     return (
         <ul className="flex flex-col gap-2 py-2">
             {messages.filter((msg) => msg.chatId === chatId).map((msg, index) => (
@@ -16,7 +17,7 @@ function Messages ({messages, chatId}) {
     );
 }
 
-function Message ({message, userId}) {
+function Message ({message, userId}: { message: string, userId: string }) {
     return (
         <li
             className={`py-2 px-6 ${
@@ -30,7 +31,7 @@ function Message ({message, userId}) {
     );
 }
 
-let socket;
+let socket: Socket<DefaultEventsMap, DefaultEventsMap>;
 
 function Chat() {
     const chatId = useSearchParams().get('chatId');
@@ -73,7 +74,7 @@ function Chat() {
     return (
         <main className="flex justify-center items-end w-dvw h-dvh bg-purple-50 dark:bg-darkVoid py-4">
             <div className="w-full max-w-2xl px-4 md:px-0">
-                <Messages messages={messages} chatId={chatId}/>
+                <Messages messages={messages} chatId={chatId || ""}/>
                 <form onSubmit={handleSubmit} className="flex">
                     <input type="text" name="message" className="p-2 rounded-s-xl ring-1 ring-white flex-grow     bg-darkVoid text-blancoHueso placeholder:text-blancoHueso focus:outline-none" />
                     <button className="px-4 bg-liquidLava rounded-e-xl ring-1 ring-white text-blancoHueso">Send</button>
