@@ -1,8 +1,6 @@
 "use client";
 
 import { useEffect } from "react";
-import { useAuth } from "@/context/authContext";
-import Cookies from "js-cookie";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { loginSchema } from "@/validations/loginSchema";
@@ -14,31 +12,14 @@ import { useRouter } from 'next/navigation';
 // The type of the form inputs is inferred from the schema
 type LoginFormInputs = z.infer<typeof loginSchema>;
 
-
-
 const Login = () => {
-
-  const router = useRouter();
-  const { loginToken, login } = useAuth();
-
   
-  const {register,handleSubmit,formState: { errors },} = useForm<LoginFormInputs>({
+  const router = useRouter();
+
+  const { register, handleSubmit, formState: { errors } } = useForm<LoginFormInputs>({
     resolver: zodResolver(loginSchema),
   });
 
-  useEffect(() => {
-    const token = Cookies.get("token");
-    if (token) {
-      const decodeToken = JSON.parse(token);
-      console.log(decodeToken);
-    } else {
-      //console.log("No hay cookie");
-    }
-  }, []);
-
-
-
-  
   // Llama al hook aquí
   const [loginn, { isLoading, error, isSuccess }] = useLoginMutation();
 
