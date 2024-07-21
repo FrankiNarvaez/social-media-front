@@ -3,6 +3,9 @@ import { Roboto_Mono } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/context/authContext";
 import { ReactNode } from "react";
+import { Provider } from  'react-redux';
+import store from "@/redux/store";
+import {Providers} from "./providers";
 
 const Roboto = Roboto_Mono({ subsets: ["latin"] });
 
@@ -21,9 +24,13 @@ export default function RootLayout({children}: RootLayoutProps) {
       <meta name="description" content={metadata.description ?? ''} />
     </head>
     <body className={`${Roboto.className} dark:bg-darkVoid`}>
+    
+    <Providers>
       <AuthProvider>
         {children}
       </AuthProvider>
+    </Providers>
+
     </body>
   </html>);
 }

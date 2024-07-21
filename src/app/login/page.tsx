@@ -8,6 +8,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { loginSchema } from "@/validations/loginSchema";
 import { z } from "zod";
 import Link from "next/link";
+import { useLoginMutation } from "@/redux/services/authApi";
+
 
 
 // The type of the form inputs is inferred from the schema
@@ -36,12 +38,28 @@ const Login = () => {
     }
   }, []);
 
-  // Function to handle the form submission and call the login function
-  const onSubmit = (data: LoginFormInputs) => {
-    login(data.email, data.password);
+  // Llama al hook aquí
+  const [loginn, { isLoading, error, isSuccess }] = useLoginMutation();
+  console.log("loginn:", loginn);
+
+  // Función de manejo del envío del formulario
+  const onSubmit =async  (data:LoginFormInputs) => {
+    try {
+      // Llama a la mutación de login
+      const result = await loginn(data); // `unwrap` maneja la promesa para obtener los datos directamente
+      const { accessToken } = result.data;
+      localStorage.setItem("token", JSON.stringify(accessToken));
+      
+      console.log(localStorage.getItem("token"));
+
+      console.log('Login successful:', result);
+    } catch (err) {
+      console.error('Failed to login:', err);
+    }
   };
 
   return (
+
     <main className="flex bg-darkVoid sm:bg-slateGray w-full min-h-screen">
       <div className="contenedor-login bg-darkVoid w-96 rounded-3xl pt-5 pb-5 pl-5 pr-5 m-auto">
         <h1 className="text-center  text-blancoHueso text-4xl">Nexo</h1>

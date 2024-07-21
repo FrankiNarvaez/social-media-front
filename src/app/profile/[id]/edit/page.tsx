@@ -23,6 +23,9 @@ const Page = ({ params: { id } }: { params: { id: number } }) => {
   const { register, handleSubmit, setValue, formState: { errors } } = useForm<Inputs>(
     { resolver: zodResolver(editProfileSchema) }
 );
+const {getCurrentUTCDate} = useAuth()
+const date = getCurrentUTCDate()
+console.log(date);
 
 
 const onSubmit: SubmitHandler<Inputs> = async (data) => {

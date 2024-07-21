@@ -17,7 +17,7 @@ const UserList: React.FC<UserListProps> = ({ title }) => {
 
   return (
     <div className='fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-70'>
-      <div className='w-[700px] h-[600px] p-4 rounded-lg shadow-lg absolute z-10 top-32 mx-auto clase-fondo'>
+      <div className='w-[300px]  min-h-screen p-4 rounded-lg shadow-lg absolute z-10 top-32 mx-auto clase-fondo sm:w-[550px] sm:h-[450px] md:ml-[254px] md:w-[500px] md:h-[400px] lg:ml-[254px] lg:w-[600px] lg:h-[500px] xl:w-[700px] xl:h-[600px]'>
         <div className="flex justify-between items-center mb-4">
           <h1>{title}</h1>
           <button className="text-black text-xl" onClick={handleClose}>&times;</button>

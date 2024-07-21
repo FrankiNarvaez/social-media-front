@@ -5,6 +5,7 @@ import { createContext } from "react"
 import Cookies from "js-cookie"
 import Router from "next/navigation"
 import { useRouter } from "next/navigation"
+import { formatISO } from 'date-fns';
 
 interface AuthContextProps {
     loginToken: string | null;
@@ -14,6 +15,7 @@ interface AuthContextProps {
     logout: () => Promise<void>;
     darkMode: boolean | null;
     handleDarkMode : () => void|null;
+    getCurrentUTCDate: () => string;
 
 }
 
@@ -74,9 +76,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         router.push("/login")
         
     }
+    const getCurrentUTCDate = () => {
+        const now = new Date();
+        return formatISO(now, { representation: 'complete' });
+      };
 
     return (
-        <AuthContext.Provider value={{ loginToken, login, register , darkMode , handleDarkMode, logout }}>
+        <AuthContext.Provider value={{ loginToken, login, register , darkMode , handleDarkMode, logout, getCurrentUTCDate }}>
             {children}
         </AuthContext.Provider>
     )

@@ -146,6 +146,7 @@ const setPrivatesPost = () =>
               updateDate={post.updateDate}
               comments={post.comments}
               favorites={post.favorites}
+              postId={index}
             />
           ))}
         </div>

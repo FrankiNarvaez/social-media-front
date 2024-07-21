@@ -3,6 +3,9 @@
 import { SubmitHandler, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { registerSchema } from "@/validations/registerSchema";
+import { useRegisterMutation } from "@/redux/services/usersApi";
+import { jwtDecode } from "jwt-decode";
+
 
 type Inputs = {
   username: string;
@@ -16,7 +19,34 @@ const Register = () => {
     resolver: zodResolver(registerSchema)
   });
 
-  const onSubmit: SubmitHandler<Inputs> = (data) => {
+  const token = localStorage.getItem('token');
+  const decodedToken = token ? jwtDecode(token) : null;
+  console.log(decodedToken);
+  
+  const [registerUser, { isLoading, error, isSuccess }] = useRegisterMutation();
+  
+
+
+  
+
+  const onSubmit: SubmitHandler<Inputs> = async (data) => {
+    
+    const result = await registerUser({
+      "username": "prueba1234",
+      "email": "prueba1234@gmail.com",
+      "password": "prueba1234",
+      "fullName": "prueba1234",
+      "age": 25,
+      "gender": "male",
+      "profileImage": "https://example.com/profile.jpg",
+      "coverImage": "https://example.com/cover.jpg",
+      "description": "Descripción del usuario prueba1234.",
+      "college": "Universidad Ejemplo",
+      "workPlace": "Empresa Ejemplo",
+      "location": "Ciudad Ejemplo",
+      "personalWebSite": "https://example.com/"
+  });
+    console.log(result);
     console.log(data);
   };
 

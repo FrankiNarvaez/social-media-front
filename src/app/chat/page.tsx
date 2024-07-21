@@ -1,13 +1,9 @@
 'use client'
 
-<<<<<<< HEAD:src/app/pages/chat/page.tsx
 import { useEffect, useState, useMemo } from "react";
 import { useAuth } from "../../context/authContext";
 import { io } from "socket.io-client";
 import { useSearchParams } from "next/navigation";
-=======
-import AuthGuard from "@/components/Guards/AuthGuard";
->>>>>>> f702e81b0a77c6fbd77c99f7097ba598f1d8353c:src/app/chat/page.tsx
 
 
 function Messages ({messages, chatId}) {

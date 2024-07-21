@@ -1,158 +1,136 @@
-"use client";
+'use client'
 
-import { useAuth } from "../../context/authContext";
 import AuthGuard from "@/components/Guards/AuthGuard";
+import { FormEvent, useState } from "react";
+import { useAuth } from "../../context/authContext";
 import Navbar from "../../components/navbar/Navbar";
-import { useForm, SubmitHandler } from "react-hook-form";
-import { zodResolver } from '@hookform/resolvers/zod';
-import { editProfileSchema } from "@/validations/editProfileSchema";
+import React from 'react';
+import { z } from 'zod';
+import { postSchema } from "@/validations/createPostSchema";
+import {useCreatePostMutation} from "@/redux/services/postsApi";
+import { jwtDecode } from "jwt-decode";
 
-type Inputs={
-  fullname: string;
-  description: string;
-  media: File | null;
-  gender: string;
-  location: string;
-  workPlace: string;
-  personalWebSite: string;
+interface MyJwtPayload {
+  id: string;
+  // otras propiedades del payload
 }
 
-const EditProfile = () => {
+const CreatePost = () => {
+  const { getCurrentUTCDate } = useAuth();
   const { loginToken } = useAuth();
-  const { register, handleSubmit, setValue, formState: { errors } } = useForm<Inputs>(
-    { resolver: zodResolver(editProfileSchema) }
-);
+  
+  const [description, setDescription] = useState('');
+  const [media, setMedia] = useState<File | null>(null);
+  const [isPublic, setIsPublic] = useState(true);
+  const [errors, setErrors] = useState<any>({}); // Para almacenar los errores de validación
+
+  const token = localStorage.getItem('token');
+  const decodedToken = token ? jwtDecode<MyJwtPayload>(token) : null; 
+
+  const id = decodedToken?.id;
+
+  console.log(id);
+
+  const [createPost, { isLoading, error, isSuccess }] = useCreatePostMutation();
+
+  const handlePost = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
+    const date = getCurrentUTCDate();
+
+    const result = await createPost({
+      "userId":"32611986-9f47-44b5-9f17-b9d9054636ad",
+      "title":"ijdfioj",
+      "description":"asjdsa",
+      "media":"image.jpg",
+      "isPublic":true
+  });
+    console.log(result.data);
+    
+    try {
+      postSchema.parse({
+        description,
+        media,
+        isPublic,
+        date
+      });
 
 
-const onSubmit: SubmitHandler<Inputs> = async (data) => {
-    console.log(data);
-}
-
-
- const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files ? e.target.files[0] : null;
-    console.log("Selected file:", file);
-    setValue("media", file as any);
-  };
+      setErrors({}); // Limpiar los errores si la validación es exitosa
+    } catch (err) {
+      if (err instanceof z.ZodError) {
+        const fieldErrors: any = {};
+        err.errors.forEach((error) => {
+          fieldErrors[error.path[0]] = error.message;
+        });
+        setErrors(fieldErrors);
+      } else {
+        console.error('Create post error:', err);
+      }
+    }
+  }
 
   return (
     <AuthGuard>
-      <Navbar></Navbar> 
-      <div className="grid">
-      <main className="col-span-9 dark:bg-black bg-white p-8 h-screen md:ml-64 overflow-auto">
-        <form className="space-y-2" onSubmit={handleSubmit(onSubmit)}>
-          <h1 className="text-2xl dark:text-white text-black mb-6 text-left">
-            Update Information
-          </h1>
-          <div className="flex justify-start flex-col">
-            <label className="mb-1 text-black dark:text-white">
-              Profile Picture
-            </label>
-            <input
-              className={`dark:text-white bg-lightGray dark:text-e dark:bg-slateGray p-1 rounded-lg ${errors.media ? 'border-red-500' : ''}`}
-              type="file"
-              accept="image/png, image/jpeg"
-              onChange={handleFileChange}
-            />
-          </div>
-          <div className="flex flex-col">
-            <label className="mb-1 text-black dark:text-white">Fullname</label>
-            <input
-              className= {`dark:placeholder-lightGray placeholder-slateGray bg-lightGray text-black dark:bg-slateGray rounded-lg px-3 py-2 w-50 focus:outline-none focus:ring-2 focus:ring-purple-600 dark:text-white ${errors.fullname ? 'border-red-500' : ''}`}
-              type="text"
-              placeholder="Enter a fullname"
-              {...register("fullname")}
-            />
-            {errors.fullname && <p className="text-red-500 text-xs italic">{errors.fullname?.message}</p>}
-          </div>
-          <div className="flex flex-col">
-            <label className="mb-1 dark:text-white text-black">Gender</label>
-            <div className="flex items-center space-x-4">
-              <label className="flex items-center dark:text-white text-black">
-                <input
-                  type="radio"
-                  value="Men"
-                  className= {`mr-2 dark:text-white text-black ${errors.gender ? 'border-red-500' : ''}`}
-                  {...register("gender")}
-                />
-                Men
-              </label>
-              <label className="flex items-center dark:text-white text-black">
-                <input
-                  type="radio"
-                  value="Woman"
-                  className="mr-2 dark:text-white text-black"
-                  {...register("gender")}
-                />
-                Woman
-              </label>
-              <label className="flex items-center dark:text-white text-black">
-                <input
-                  type="radio"
-                  value="Other"
-                  className="mr-2 dark:text-white text-black"
-                  {...register("gender")}
-                />
-                Other
-              </label>
-            </div>
-          </div>
-          <div className="flex flex-col">
-            <label className="mb-1 dark:text-white text-black">
+      <Navbar />
+      <main className="min-h-screen bg-blancoHueso dark:bg-slateGray flex items-center justify-center text-white px-5">
+        <form onSubmit={handlePost} className="border border-darkVoid bg-blancoHueso dark:bg-darkVoid flex flex-col justify-between p-6 rounded-xl w-full max-w-xl min-h-[600px]">
+          <h1 className="text-4xl text-darkVoid dark:text-blancoHueso">CREATE A POST</h1>
+          
+          <div className="mb-4">
+            <label className="block text-darkVoid dark:text-blancoHueso text-sm font-bold mb-2">
               Description
             </label>
-            <input
-              className={`dark:placeholder-lightGray placeholder-slateGray bg-lightGray text-black dark:bg-slateGray rounded-lg px-3 py-2 w-50 focus:outline-none focus:ring-2 focus:ring-purple-600 dark:text-white ${errors.description ? 'border-red-500' : ''}`}
-              type="text"
+            <textarea
+              id="description"
               placeholder="Enter a description"
-              {...register("description")}
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              className={`shadow appearance-none rounded w-full py-2 px-3 text-darkVoid bg-lightGray leading-tight focus:outline-none focus:shadow-outline placeholder-darkVoid ${errors.description ? 'border-red-500' : ''}`}
             />
-            {errors.description && <p className="text-red-500 text-xs italic">{errors.description?.message}</p>}
+            {errors.description && <p className="text-red-500 text-xs italic">{errors.description}</p>}
           </div>
-          <div className="flex flex-col">
-            <label className="mb-1 dark:text-white text-black">Location</label>
-            <input
-              className={`dark:placeholder-lightGray placeholder-slateGray bg-lightGray text-black dark:bg-slateGray rounded-lg px-3 py-2 w-50 focus:outline-none focus:ring-2 focus:ring-purple-600 dark:text-white ${errors.location ? 'border-red-500' : ''}`}
-              type="text"
-              placeholder="Enter a location"
-              {...register("location")}
-            />
-            {errors.location && <p className="text-red-500 text-xs italic">{errors.location?.message}</p>}
-          </div>
-          <div className="flex flex-col">
-            <label className="mb-1 dark:text-white text-black">Workplace</label>
-            <input
-              className= {`dark:placeholder-lightGray placeholder-slateGray bg-lightGray text-black dark:bg-slateGray rounded-lg px-3 py-2 w-50 focus:outline-none focus:ring-2 focus:ring-purple-600 dark:text-white ${errors.workPlace ? 'border-red-500' : ''}`}
-              type="text"
-              placeholder="Enter a workplace"
-              {...register("workPlace")}
-            />
-            {errors.workPlace && <p className="text-red-500 text-xs italic">{errors.workPlace?.message}</p>}
-          </div>
-          <div className="flex flex-col">
-            <label className="mb-1 dark:text-white text-black">
-              Personal Website
+          <div className="mb-4">
+            <label className="block text-darkVoid dark:text-blancoHueso text-sm font-bold mb-2">
+              Media
             </label>
             <input
-              className={`dark:placeholder-lightGray placeholder-slateGray bg-lightGray text-black dark:bg-slateGray rounded-lg px-3 py-2 w-50 focus:outline-none focus:ring-2 focus:ring-purple-600 dark:text-white ${errors.personalWebSite ? 'border-red-500' : ''}`}
-              type="text"
-              placeholder="Enter a link"
-              {...register("personalWebSite")}
+              type="file"
+              id="media"
+              title="Upload a media file"
+              onChange={(e) => setMedia(e.target.files ? e.target.files[0] : null)}
+              className={`shadow appearance-none rounded w-full py-2 px-3 text-darkVoid bg-lightGray leading-tight focus:outline-none focus:shadow-outline placeholder-darkVoid ${errors.media ? 'border-red-500' : ''}`}
             />
-            {errors.personalWebSite && <p className="text-red-500 text-xs italic">{errors.personalWebSite?.message}</p>}
+            {errors.media && <p className="text-red-500 text-xs italic">{errors.media}</p>}
           </div>
-          <div className="flex justify-end mt-6">
+          <div className="flex justify-end">
+            <button
+              type="button"
+              className="text-darkVoid dark:text-blancoHueso px-2 focus:bg-dustyGray focus:rounded"
+              onClick={() => setIsPublic(true)}
+            >
+              <h2>Public</h2>
+            </button>
+            <button
+              type="button"
+              className="text-darkVoid dark:text-blancoHueso px-2 focus:bg-dustyGray focus:rounded"
+              onClick={() => setIsPublic(false)}
+            >
+              <h2>Private</h2>
+            </button>
+          </div>
+          <div className="flex items-center justify-end md:justify-end">
             <button
               type="submit"
-              className=" bg-liquidLava hover:bg-purple-400 text-white font-bold py-2 px-4 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-600">
-              Update
+              className="bg-ligthPurple hover:bg-liquidLava text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+            >
+              Create Post
             </button>
           </div>
         </form>
       </main>
-      </div>
     </AuthGuard>
   );
-};
+}
 
-export default EditProfile;
+export default CreatePost;
