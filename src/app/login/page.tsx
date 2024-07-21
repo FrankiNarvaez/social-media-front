@@ -8,25 +8,21 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { loginSchema } from "@/validations/loginSchema";
 import { z } from "zod";
 import Link from "next/link";
-
 import { useLoginMutation } from "@/redux/services/authApi";
-
 import { useRouter } from 'next/navigation';
 
 // The type of the form inputs is inferred from the schema
 type LoginFormInputs = z.infer<typeof loginSchema>;
 
-const Login = () => {
-  
-  const { loginToken, login } = useAuth();
-  const router = useRouter();
 
-  // useForm hook with zodResolver to validate the form
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<LoginFormInputs>({
+
+const Login = () => {
+
+  const router = useRouter();
+  const { loginToken, login } = useAuth();
+
+  
+  const {register,handleSubmit,formState: { errors },} = useForm<LoginFormInputs>({
     resolver: zodResolver(loginSchema),
   });
 
