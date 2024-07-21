@@ -1,4 +1,4 @@
-'use client';
+'use server';
 import React, { useState } from 'react';
 import Post from '@/components/post/Post';
 import AuthGuard from "@/components/Guards/AuthGuard";
