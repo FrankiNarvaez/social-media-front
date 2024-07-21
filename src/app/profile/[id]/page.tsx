@@ -5,8 +5,8 @@ import { useAuth } from "@/context/authContext";
 import { FaPencilAlt } from "react-icons/fa";
 import Navbar from "@/components/navbar/Navbar";
 import Post from "@/components/post/Post";
-
 import UserList from "@/components/userlist/Userlist";
+import AuthGuard from "@/components/Guards/AuthGuard";
 
 interface PostData {
   userid: string;
@@ -20,7 +20,7 @@ interface PostData {
 }
 
 const Profile = () => {
-  const { loginToken, register } = useAuth();
+  const { loginToken } = useAuth();
   const [isOpenFollowers, setIsOpenFollowers] = useState(false);
   const [isOpenFollowed, setIsOpenFollowed] = useState(false);
 
@@ -183,6 +183,7 @@ const Profile = () => {
   const [posts, setPosts] = useState<PostData[]>(postsArray);
 
   return (
+    <AuthGuard>
     <div>
       <Navbar />
       <main className="bg-darkVoid  flex md:ml-64 min-h-screen ">
@@ -223,7 +224,7 @@ const Profile = () => {
                 {isOpenFollowers && <UserList title="Followeds List" />}
               </div>
             </div>
-            <button className="mt-6 flex items-center justify-center px-4 py-2 text-base sm:text-lg bg-blue-500 text-white rounded-md hover:bg-blue-600">
+            <button className="mt-6 flex items-center justify-center px-4 py-2 text-base sm:text-lg bg-liquidLava text-white rounded-md hover:bg-purple-800">
               <FaPencilAlt className="mr-2" /> Edit profile
             </button>
           </div>
@@ -263,6 +264,7 @@ const Profile = () => {
         </div>
       </main>
     </div>
+    </AuthGuard>
   );
 };
 

@@ -47,7 +47,7 @@ const Login = () => {
       // Llama a la mutación de login
       const result = await loginn(data).unwrap(); // `unwrap` maneja la promesa para obtener los datos directamente
       const { accessToken } = result;
-      localStorage.setItem("token", JSON.stringify(accessToken));
+      Cookies.set("token", JSON.stringify(accessToken));
       console.log('Login successful:', result);
       router.push("/homepage");
     } catch (err) {

@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
 export function middleware(request: NextRequest) {
-    const protectedRoutes = [ '/chat', '/create', '/notification', 'profile', '/settings'];
+    const protectedRoutes = [ '/chat', '/create', '/other-profile', '/homepage', '/profile/path:*', '/settings'];
     const currentPath = request.nextUrl.pathname;
 
     if(protectedRoutes.includes(currentPath)) {
@@ -16,5 +16,5 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-    matcher: ['/chat', '/create', '/notification', 'profile', '/settings']
+    matcher: ['/chat', '/create', '/other-profile', '/homepage', '/profile/:path*', '/settings']
 }

@@ -30,8 +30,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     const [ darkMode  , setdarkMode ] = useState(true);
     const [loginToken, setloginToken] = useState<any>("Hola");
     const router = useRouter()        
-    const login = async (email: string, password: string  ) => {
 
+    const login = async (email: string, password: string  ) => {
         const data = {
             email: email,
             password: password
