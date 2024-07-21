@@ -49,7 +49,7 @@ export default function SettingsForm() {
                 Username (edit)
               </label>
               <input
-                className={`${darkMode ? "bg-dustyGray text-blancoHueso placeholder:text-darkVoid" : "bg-blancoHueso text-darkVoid border-2"} w-full p-2 rounded`}
+                className={`${darkMode ? "placeholder:text-black text-black  bg-lightGray" : " text-darkVoid border-2 placeholder-black bg-dustyGray"} w-full p-2 rounded`}
                 type="text"
                 id="username"
                 placeholder="Enter your username"
@@ -66,7 +66,7 @@ export default function SettingsForm() {
                 Password (edit)
               </label>
               <input
-                className={`${darkMode ? "bg-dustyGray text-blancoHueso placeholder:text-darkVoid" : "bg-blancoHueso text-darkVoid border-2"} w-full p-2 rounded `}
+                className={`${darkMode ? " text-black  bg-lightGray placeholder:text-black" : "placeholder-black text-darkVoid border-2 bg-dustyGray "} w-full p-2 rounded `}
                 type="password"
                 id="password"
                 placeholder="Enter your password"

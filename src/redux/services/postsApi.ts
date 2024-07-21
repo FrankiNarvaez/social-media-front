@@ -1,8 +1,24 @@
+
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
+
+
+console.log(localStorage.getItem('token'));
 
 export const postsApi = createApi({
   reducerPath: 'postsApi',
-  baseQuery: fetchBaseQuery({ baseUrl: 'https://social-media-api-1.onrender.com' }),
+  baseQuery: fetchBaseQuery({ baseUrl: 'https://social-media-api-1.onrender.com',
+   prepareHeaders: (headers, { getState }) => {
+
+    const token = localStorage.getItem('token');
+    //const subtoken = token?.substring(1, token.length - 1); En caso de que de unauthorized es porque el token tiene comillas
+    if (token) {
+      const BearerToken = `Bearer ${token}`
+      console.log(BearerToken);
+      headers.set('Authorization', BearerToken);
+      console.log(headers)
+    }
+    return headers;
+   }}),
   endpoints: (builder) => ({
 
     createPost: builder.mutation({

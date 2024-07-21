@@ -32,7 +32,9 @@ export const followersApi = createApi ({
 
 export const { 
   useFollowersMutation, 
+
   useGetfollowedQuery, 
   useGetfollowersQuery, 
+  
   useDeleteFollowerMutation 
 } = followersApi
