@@ -2,9 +2,10 @@
 
 import React, { useState } from 'react';
 import Comments from '../comments/Comments';
-import { useAuth } from '@/context/UserContext';
+
 import { useDeleteFavouriteMutation, useAddFavouriteMutation } from '@/store/services/favouritesApi';
 import { useCreateLikeMutation, useDeleteLikeMutation } from '@/store/services/likesApi';
+import { useUser } from '@/context/UserContext';
 
 interface PostProps {
   userid: string;
@@ -22,30 +23,34 @@ const Post: React.FC<PostProps> = ({ userid, updateDate, media, likes, comments,
   const [showComments, setShowComments] = useState(false);
   const [isLiked, setIsLiked] = useState(false);
   const [isFavorited, setIsFavorited] = useState(false);
+  const [likeCount, setLikeCount] = useState(likes);
+  const [favoriteCount, setFavoriteCount] = useState(favorites);
+
+
+  const { user } = useUser();
+  const id = user?.userId;
 
   const [addFavourite, { isLoading: isLoadingAddFav, error: errorAddFav }] = useAddFavouriteMutation();
   const [deleteFavourite, { isLoading: isLoadingDelFav, error: errorDelFav }] = useDeleteFavouriteMutation();
   const [createLike, { isLoading: isLoadingAddLike, error: errorAddLike }] = useCreateLikeMutation();
   const [deleteLike, { isLoading: isLoadingDelLike, error: errorDelLike }] = useDeleteLikeMutation();
 
-  const date = new Date();
-
   const handleLikeClick = async () => {
     const data = {
-      userid,
+      userid: id,
       postId,
-      date,
-      action: isLiked ? 'unlike' : 'like'
     };
     console.log(data);
 
     try {
       if (isLiked) {
-        await deleteLike({ userid, postId, date });
+        await deleteLike(data);
         setIsLiked(false);
+        setLikeCount((prev) => prev - 1);
       } else {
-        await createLike({ userid, postId, date });
+        await createLike(data);
         setIsLiked(true);
+        setLikeCount((prev) => prev + 1);
       }
     } catch (error) {
       console.error('Error handling like action:', error);
@@ -54,20 +59,20 @@ const Post: React.FC<PostProps> = ({ userid, updateDate, media, likes, comments,
 
   const handleFavoriteClick = async () => {
     const data = {
-      userid,
+      userid: id,
       postId,
-      date,
-      action: isFavorited ? 'unfavorite' : 'favorite'
     };
     console.log(data);
 
     try {
       if (isFavorited) {
-        await deleteFavourite({ userid, postId, date });
+        await deleteFavourite(data);
         setIsFavorited(false);
+        setFavoriteCount((prev) => prev - 1);
       } else {
-        await addFavourite({ userid, postId, date });
+        await addFavourite(data);
         setIsFavorited(true);
+        setFavoriteCount((prev) => prev + 1);
       }
     } catch (error) {
       console.error('Error handling favorite action:', error);
@@ -99,12 +104,12 @@ const Post: React.FC<PostProps> = ({ userid, updateDate, media, likes, comments,
 
         <div className="flex justify-around mb-4">
           <section className="flex items-center">
-            <button 
-              className={`flex items-center ${isLiked ? 'text-red-500' : 'text-gray-500'}`} 
-              onClick={handleLikeClick} 
+            <button
+              className={`flex items-center ${isLiked ? 'text-red-500' : 'text-gray-500'}`}
+              onClick={handleLikeClick}
               disabled={isLoadingAddLike || isLoadingDelLike}
             >
-              {likes} <span className="ml-1">♥</span>
+              {likeCount} <span className="ml-1">♥</span>
             </button>
           </section>
 
@@ -113,12 +118,12 @@ const Post: React.FC<PostProps> = ({ userid, updateDate, media, likes, comments,
           </section>
 
           <section className="flex items-center">
-            <button 
-              className={`flex items-center ${isFavorited ? 'text-yellow-500' : 'text-gray-500'}`} 
-              onClick={handleFavoriteClick} 
+            <button
+              className={`flex items-center ${isFavorited ? 'text-yellow-500' : 'text-gray-500'}`}
+              onClick={handleFavoriteClick}
               disabled={isLoadingAddFav || isLoadingDelFav}
             >
-              {favorites} <span className="ml-1">⭐</span>
+              {favoriteCount} <span className="ml-1">⭐</span>
             </button>
           </section>
         </div>
