@@ -110,7 +110,7 @@ const Comments = ({ postId }: { postId: string }) => {
                   />
                 ))
               ) : (
-                <div>No comments yet. Be the first to comment!</div>
+                <div>Aún no hay comentarios. Sé el primero en comentar!</div>
               )}
             </div>
           </div>
