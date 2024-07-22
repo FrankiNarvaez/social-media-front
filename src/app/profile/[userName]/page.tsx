@@ -12,18 +12,6 @@ import { useGetUserWithPostsByUserNameQuery }  from "@/store/services/usersApi";
 import postcss from "postcss";
 import { set } from "date-fns";
 
-interface PostData1 {
-  userid: string;
-  title: string;
-  description: string;
-  media: string;
-  likes: number;
-  updateDate: Date;
-  comments: number;
-  favorites: number;
-  postId: string;
-}
-
 interface PostData {
   description: string;
   isPublic: boolean;
@@ -68,19 +56,12 @@ const Profile = ({ params: userName }: { params: { userName: string } }) => {
   };
 
   const { data, currentData, isLoading, isSuccess } = useGetUserWithPostsByUserNameQuery(userName?.userName);
-  console.log(currentData);
 
   let datos: UserData = data
 
   const postsArray: PostData[] = datos?.userPost;
 
-  const [posts, setPosts] = useState<PostData[]>(postsArray);
-
-  if (isSuccess) {
-    console.log("entra")
-    setPosts(postsArray);
-    console.log('posts', posts);
-  }
+  const [posts, setPosts] = useState<PostData[]>(postsArray);  
 
   return (
     <div className="min-h-screen bg-blancoHueso dark:bg-gray-900">
@@ -133,8 +114,8 @@ const Profile = ({ params: userName }: { params: { userName: string } }) => {
                 {isOpenFollowers && <UserList title="Followeds List" />}
               </div>
             </div>
-            <Link href={`/profile/${user?.userName}/edit`} className="mt-6 flex items-center justify-center px-4 py-2 text-base sm:text-lg bg-liquidLava text-white rounded-md hover:bg-purple-800 transition duration-200">
-              <FaPencilAlt className="mr-2" /> Editar perfil
+            <Link href={user?.userId !== userName.userName ? `/profile/${user?.userName}/edit` : `/homepage`} className="mt-6 flex items-center justify-center px-4 py-2 text-base sm:text-lg bg-liquidLava text-white rounded-md hover:bg-purple-800 transition duration-200">
+              <FaPencilAlt className="mr-2" /> {user?.userId !== userName.userName ? 'Edit profile' : 'Follow user'}
             </Link>
           </div>
 
@@ -159,7 +140,7 @@ const Profile = ({ params: userName }: { params: { userName: string } }) => {
             {posts?.map((post, index) => (
               <div key={index} className="bg-gray-200 dark:bg-gray-800 rounded-lg shadow-lg p-4">
                 <Post
-                  userid={post?.userId}
+                  userId={post?.userId}
                   title={post?.title}
                   description={post?.description}
                   media={post?.media}

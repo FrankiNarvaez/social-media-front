@@ -1,15 +1,19 @@
-'use client'
+'use client';
 
-import React, { useState, useEffect, FormEvent } from 'react';
+import { useUser } from "@/context/UserContext";
+import React, { useState, FormEvent } from 'react';
 import { useSearchPostsQuery, useSearchUsersQuery } from '@/store/services/search';
+import { useRouter } from 'next/navigation';
 
-const ITEMS_PER_PAGE = 6; // Número de elementos por página
+const ITEMS_PER_PAGE = 6;
 
 const SearchBar = () => {
     const [searchParameter, setSearchParameter] = useState('');
     const [filter, setFilter] = useState('people');
     const [results, setResults] = useState([]);
-    const [currentPage, setCurrentPage] = useState(1); // Estado para la página actual
+    const [currentPage, setCurrentPage] = useState(1);
+
+    const router = useRouter();
 
     const { data: usersData, error: usersError } = useSearchUsersQuery(searchParameter, {
         skip: filter !== 'people',
@@ -21,13 +25,11 @@ const SearchBar = () => {
 
     const handleSearch = (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault();
+        searchAndCacheResults();
+    };
 
-        if (!token) {
-            console.error('No token available');
-            return;
-        }
-
-        const cacheKey = `${searchParameter}_${filter}`;
+    const searchAndCacheResults = () => {
+        const cacheKey = `${filter}-${searchParameter}`;
         const cachedResults = localStorage.getItem(cacheKey);
 
         if (cachedResults) {
@@ -37,6 +39,7 @@ const SearchBar = () => {
         }
 
         if (filter === 'people' && usersData) {
+            console.log('Datos de usuarios obtenidos:', usersData);
             const filteredUsers = usersData.map((user) => ({
                 age: user.age,
                 fullName: user.fullName,
@@ -47,8 +50,19 @@ const SearchBar = () => {
             localStorage.setItem(cacheKey, JSON.stringify(filteredUsers));
             setResults(filteredUsers);
         } else if (filter === 'posts' && postsData) {
-            localStorage.setItem(cacheKey, JSON.stringify(postsData));
-            setResults(postsData);
+            console.log('Datos de publicaciones obtenidos:', postsData);
+            const filteredPosts = postsData.map((post) => ({
+                postId: post.postId,
+                title: post.title,
+                description: post.description,
+                media: post.media,
+                isPublic: post.isPublic,
+                publicationDate: post.publicationDate,
+                updateDate: post.updateDate,
+                likes: post.likes,
+            }));
+            localStorage.setItem(cacheKey, JSON.stringify(filteredPosts));
+            setResults(filteredPosts);
         }
 
         if (usersError) {
@@ -59,13 +73,11 @@ const SearchBar = () => {
             console.error('Error fetching posts:', postsError);
         }
 
-        setCurrentPage(1); // Reiniciar a la primera página al realizar una nueva búsqueda
+        setCurrentPage(1);
     };
 
-    // Calcular el número de páginas
     const totalPages = Math.ceil(results.length / ITEMS_PER_PAGE);
 
-    // Obtener los resultados de la página actual
     const currentResults = results.slice(
         (currentPage - 1) * ITEMS_PER_PAGE,
         currentPage * ITEMS_PER_PAGE
@@ -99,13 +111,25 @@ const SearchBar = () => {
                     </form>
                 </div>
             </div>
-            <SearchUser results={currentResults} totalPages={totalPages} currentPage={currentPage} setCurrentPage={setCurrentPage} />
+            <SearchResults results={currentResults} totalPages={totalPages} currentPage={currentPage} setCurrentPage={setCurrentPage} filter={filter} />
         </div>
     );
 };
 
-const SearchUser = ({ results, totalPages, currentPage, setCurrentPage }) => {
-    const defaultProfileImage = 'https://th.bing.com/th/id/OIP.m5kS1irkbp6YT0EvLKhBzwAAAA?rs=1&pid=ImgDetMain'; 
+const SearchResults = ({ results, totalPages, currentPage, setCurrentPage, filter }) => {
+    const router = useRouter();
+
+    const handleUserClick = (userName) => {
+        console.log(`Redirecting to /profile/${userName}/edit`);
+        router.push(`/profile/${userName}/edit`);
+    };
+
+    const handlePostClick = (postId) => {
+        console.log(`Redirecting to /post/${postId}`);
+        router.push(`/post/${postId}`);
+    };
+
+    const defaultProfileImage = 'https://th.bing.com/th/id/OIP.m5kS1irkbp6YT0EvLKhBzwAAAA?rs=1&pid=ImgDetMain';
 
     return (
         <div className="mt-4 flex flex-col justify-between max-h-96 overflow-y-auto">
@@ -113,19 +137,38 @@ const SearchUser = ({ results, totalPages, currentPage, setCurrentPage }) => {
                 {results && results.length > 0 ? (
                     <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-black">
                         {results.map((result, index) => (
-                            <li key={index} className="border border-gray-300 rounded-lg p-4 shadow-md flex flex-col items-center text-center">
-                                <img 
-                                    src={result.profileImage || defaultProfileImage} 
-                                    alt={result.userName} 
-                                    className="w-24 h-24 rounded-full object-cover mb-4" 
-                                />
-                                <div>
-                                    <p className="font-bold text-lg">{result.fullName}</p>
-                                    <p className="text-gray-500">@{result.userName}</p>
-                                    <p className="text-gray-500">Age: {result.age}</p>
-                                    <p className="text-gray-500">Location: {result.location || 'Unknown'}</p>
-                                </div>
-                            </li>
+                            filter === 'people' ? (
+                                <li
+                                    key={index}
+                                    className="border border-gray-300 rounded-lg p-4 shadow-md flex flex-col items-center text-center cursor-pointer"
+                                    onClick={() => handleUserClick(result.userName)}
+                                >
+                                    <img
+                                        src={result.profileImage || defaultProfileImage}
+                                        alt={result.userName}
+                                        className="w-24 h-24 rounded-full object-cover mb-4"
+                                    />
+                                    <div>
+                                        <p className="font-bold text-lg">{result.fullName}</p>
+                                        <p className="text-gray-500">@{result.userName}</p>
+                                        <p className="text-gray-500">Age: {result.age}</p>
+                                        <p className="text-gray-500">Location: {result.location || 'Unknown'}</p>
+                                    </div>
+                                </li>
+                            ) : (
+                                <li
+                                    key={index}
+                                    className="border border-gray-300 rounded-lg p-4 shadow-md flex flex-col items-center text-center cursor-pointer"
+                                    onClick={() => handlePostClick(result.postId)}
+                                >
+                                    <div>
+                                        <p className="font-bold text-lg">{result.title}</p>
+                                        <p className="text-gray-500">{result.description}</p>
+                                        <p className="text-gray-500">Likes: {result.likes}</p>
+                                        <p className="text-gray-500">Published: {new Date(result.publicationDate).toLocaleString()}</p>
+                                    </div>
+                                </li>
+                            )
                         ))}
                     </ul>
                 ) : (

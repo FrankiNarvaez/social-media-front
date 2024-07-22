@@ -47,6 +47,7 @@ export default (req: NextApiRequest, res: NextApiResponse) => {
 
     // Set auth-token header from cookie:
     if (accessToken) {
+      console.log(accessToken)
       req.headers['Authorization'] = `Bearer ${accessToken}`
     }
 
