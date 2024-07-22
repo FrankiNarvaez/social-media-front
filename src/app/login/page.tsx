@@ -8,19 +8,23 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { loginSchema } from "@/validations/loginSchema";
 import { z } from "zod";
 import Link from "next/link";
-
+import AuthGuard from "@/components/Guards/AuthGuard";
 import { useLoginMutation } from "@/redux/services/authApi";
 
 import { useRouter } from 'next/navigation';
+
 
 // The type of the form inputs is inferred from the schema
 type LoginFormInputs = z.infer<typeof loginSchema>;
 
 const Login = () => {
   
-  const { loginToken, login } = useAuth();
+  const { loginToken, login , handleDarkMode } = useAuth();
   const router = useRouter();
-
+  const { setDarkMode } = useAuth();
+  const setHandleDarkMode = () =>{
+    handleDarkMode
+  }
   // useForm hook with zodResolver to validate the form
   const {
     register,
@@ -52,8 +56,10 @@ const Login = () => {
       // Llama a la mutación de login
       const result = await loginn(data).unwrap(); // `unwrap` maneja la promesa para obtener los datos directamente
       let { accessToken } = result;
+      
       localStorage.setItem("token", accessToken);
       console.log('Login successful:', result);
+      setDarkMode(result.darkMode)
       router.push("/homepage");
     } catch (err) {
       console.error('Failed to login:', err);

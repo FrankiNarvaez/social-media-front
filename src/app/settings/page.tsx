@@ -40,7 +40,7 @@ export default function SettingsForm() {
               className="text-blancoHueso bg-slateGray p-2 rounded-full"
               onClick={setHandleDarkMode}
             >
-              {darkMode ? "🌞" : "🌜"}
+              {darkMode ? "🌜" : "🌞"}
             </button>
           </div>
           <form onSubmit={handleSubmit(onSubmit)}>

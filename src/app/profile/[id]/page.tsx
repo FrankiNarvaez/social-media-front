@@ -48,6 +48,7 @@ const Profile = () => {
       name: "brayan andres pinchao",
       age: 20,
       genre: "male",
+    
     },
   ];
 
