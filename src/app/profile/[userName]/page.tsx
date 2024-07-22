@@ -206,7 +206,7 @@ const Profile = ({ params: userName }: { params: { userName: string } }) => {
               height: "200px",
             }}
           >
-            <div className="absolute inset-0 flex justify-center items-center dark:bg-black bg-opacity-50">
+            <div className="absolute inset-0 flex justify-center items-center bg-opacity-50">
               <img
                 className="rounded-full border-4 border-white w-24 h-24 sm:w-32 sm:h-32 md:w-40 md:h-40 lg:w-48 lg:h-48"
                 src={datos[id].imagePerfil}
